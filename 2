@@ -1,0 +1,232 @@
+create database qlyCNHDAN
+go
+
+use qlyCNHDAN
+go
+
+--Bảng Các Nhà Hàng Trong Chuỗi :
+create table NhaHang
+(
+	MaNH varchar(10) primary key,
+	Ngaythanhlap date,
+	DiaDiem nvarchar(30)
+)
+go
+
+Insert into NhaHang values
+	('HN01','2018/02/26',N'Hà Nội')
+go
+
+--Bảng Quản Lý Của Chuỗi Nhà Hàng :
+create table QuanLy
+(
+	MaQL varchar(10) primary key,
+	TenQL nvarchar(40),
+	GioiTinh nvarchar(4),
+	Ngaysinh date,
+	sodt varchar(10),
+	Quequan nvarchar(20),
+	MaNH varchar(10),
+	foreign key(MaNH) references dbo.NhaHang(MaNH)
+)
+go
+
+Insert into QuanLy values
+	('KHN01',N'Nguyễn Văn Mạnh',N'Nam','2000/05/11','03456789xx',N'Nam Định','HN01')
+go
+
+--Bảng Nhân Viên Của Chuỗi Nhà Hàng : 
+create table NhanVien
+(
+	MaNV varchar(10) primary key,
+	TenNV nvarchar(40),
+	GioiTinh nvarchar(4),
+	Ngaysinh date,
+	sodt varchar(10),
+	Quequan nvarchar(20),
+	MaNH varchar(10),
+	foreign key (MaNH) references dbo.NhaHang(MaNH)
+)
+go
+
+Insert into NhanVien values
+	('BHN01',N'Trần Minh Thư',N'Nữ','2003/02/26','08456789xx',N'Hà Nội','HN01')
+go
+
+Insert into NhanVien values
+	('BHN02',N'Tạ Xuân Doanh',N'Nam','2003/10/02','08456789xx',N'Hà Nội','HN01')
+go
+
+--Bảng Kho Của Chuỗi Nhà Hàng : 
+create table Kho
+(
+	MaNH varchar(10),
+	LoaiDo nvarchar(20),
+	MaDo varchar(10) primary key,
+	TenDo nvarchar(15),
+	SoLuong nvarchar(10),
+	foreign key(MaNH) references dbo.NhaHang(MaNH),
+)
+go
+
+Insert into Kho values
+	('HN01',N'Bánh Mì Kẹp','BM00',N'Bánh Mì','150 Cái')
+go
+
+Insert into Kho values
+	('HN01',N'Đồ Ăn Kèm','MD01',N'Xúc Xích','50 Túi')
+go
+
+Insert into Kho values
+	('HN01',N'Nước','NU03',N'Sữa Dâu','60 Chai')
+go
+
+Insert into Kho values
+	('HN01',N'Nước','NU01',N'Nước Lọc','60 Chai')
+go
+
+Insert into Kho values
+	('HN01',N'Nước','NU02',N'C2','60 Chai')
+go
+
+--Bảng Thực Đơn : 
+create table ThucDon
+(	
+	MaDoAn varchar(10) not null,
+	TenDo nvarchar(20),
+	GiaTienDoAn float,
+	foreign key(MaDoAn) references dbo.Kho(MaDo)
+)
+go
+
+Insert into ThucDon values
+	('BM00',N'Bánh Mì','5000')
+go
+
+Insert into ThucDon values
+	('MD01',N'Xúc Xích','10000')
+go
+
+Insert into ThucDon values
+	('NU03',N'Sữa Dâu','15000')
+go
+
+Insert into ThucDon values
+	('NU01',N'Nước Lọc','8000')
+go
+
+Insert into ThucDon values
+	('NU02',N'C2','10000')
+go
+
+
+
+--Bảng Hóa Đơn Thu :
+create table HoaDonThu
+(
+	MaHDT varchar(10) primary key,
+	MaNH varchar(10),
+	MaDo varchar(10),
+	TenDo nvarchar(20),
+	GiaTien float,
+	Ngaythu date,
+	foreign key(MaNH) references dbo.NhaHang(MaNH),
+	foreign key(MaDo) references dbo.Kho(MaDo)
+)
+go
+
+Insert into HoaDonThu values
+	('HDT232363','HN01','NU03',N'Sữa Dâu','15000','2023/10/23')
+go
+
+
+
+--Bảng Hóa Đơn Nhập : 
+create table HoaDonNhap
+(
+	MaHDN varchar(10) primary key,
+	MaDo varchar(10),
+	TenDo nvarchar(20),
+	SoLuong nvarchar(10),
+	GiaTien float,
+	NgayNhap date,
+	foreign key(MaDo) references dbo.Kho(MaDo)
+)
+go
+
+Insert into HoaDonNhap values
+	('HDN257363','BM00',N'Bánh Mì','100 cái','200000','2023/8/20')
+
+
+--Bảng Thống Kê Trả Lương :
+create table BangThongKeTraLuong
+(
+	MaPhieuTraLuong varchar(10) primary key,
+	MaNH varchar(10),
+	SoTien float,
+	foreign key(MaNH) references dbo.NhaHang(MaNH),
+)
+go
+Insert into BangThongKeTraLuong values
+	('KLHN01','HN01','22000000')
+go
+
+Insert into BangThongKeTraLuong values
+	('KLBHN01','HN01','20900000')
+go
+
+--Bảng Lương Của Quản Lý :
+create table LuongQL
+(
+	MaPhieuTraLuongQL varchar(10) not null,
+	MaQL varchar(10),
+	TenQL nvarchar(40),
+	LuongThuong float,
+	TienLuong float,
+	TongTienLuong float,
+	foreign key(MaQL) references dbo.QuanLy(MaQL),
+	foreign key(MaPhieuTraLuongQL) references dbo.BangThongKeTraLuong(MaPhieuTraLuong)
+)	
+go
+
+Insert into LuongQL values
+	('KLHN01','KHN01',N'Nguyễn Văn Mạnh','2000000','20000000','22000000')
+go
+
+--Bảng Lương Của Nhân Viên :
+create table LuongNV
+(
+	MaPhieuTraLuongNV varchar(10) not null,
+	MaNV varchar(10),
+	TenNV nvarchar(40),
+	LuongThuong float,
+	TienChuyenCan float,
+	TienLuong float,
+	TongTienLuong float,
+	foreign key(MaNV) references dbo.NhanVien(MaNV),
+	foreign key(MaPhieuTraLuongNV) references dbo.BangThongKeTraLuong(MaPhieuTraLuong)
+)	
+go
+
+Insert into LuongNV values
+	('KLBHN01','BHN01',N'Trần Minh Thư','200000','500000','10000000','10700000')
+go
+
+Insert into LuongNV values
+	('KLBHN01','BHN02',N'Tạ Xuân Doanh','200000','0','10000000','10200000')
+go
+
+--Bảng Báo Cáo Thu Chi :
+create table BaoCao 
+(
+	MaQL varchar(10),
+	MaHDT varchar(10),
+	TongThu float,
+	MaHDN varchar(10),
+	TongNhap float,
+	foreign key(MaQL) references dbo.QuanLy(MaQL),
+	foreign key(MaHDT) references dbo.HoaDonThu(MaHDT),
+	foreign key(MaHDN) references dbo.HoaDonNhap(MaHDN)
+)
+go
+Viết cho Anh Duy
